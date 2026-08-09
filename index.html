@@ -51,10 +51,12 @@
 
   /* ---------- Title block ---------- */
   .titleWrap{
-    text-align:center;
-    margin-top:64px;
-    padding: 0 20px;
+    text-align:left;
+    align-self:flex-start;
+    margin-top:26px;
+    padding: 0 24px;
     z-index:3;
+    max-width: 640px;
   }
   .eyebrow{
     font-family:'Baloo 2', sans-serif;
@@ -79,7 +81,7 @@
     font-size: clamp(14px, 2.4vw, 18px);
     color: rgba(244,230,200,0.86);
     max-width: 480px;
-    margin: 14px auto 0;
+    margin: 14px 0 0;
     line-height:1.6;
   }
   .tagline b{ color: var(--turmeric); font-weight:700; }
@@ -95,8 +97,10 @@
   .stats{
     display:flex; gap:26px; margin-top:22px; z-index:3;
     font-family:'Baloo 2', sans-serif;
+    align-self:flex-start;
+    padding: 0 24px;
   }
-  .stat{ text-align:center; }
+  .stat{ text-align:left; }
   .stat .n{ font-size:22px; font-weight:700; color:var(--turmeric); }
   .stat .l{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(244,230,200,0.7); }
   .dot-online{ width:9px; height:9px; border-radius:50%; background:#38D66B; display:inline-block; box-shadow:0 0 8px #38D66B; margin-right:6px; }
@@ -172,12 +176,49 @@
     .stats{ gap:18px; }
     .player{ padding:8px 14px 8px 8px; }
     .track{ font-size:13.5px; }
+    .navbar{ padding:14px 16px; }
   }
+
+  /* ---------- Top nav: outbound platform links ---------- */
+  .navbar{
+    width:100%;
+    display:flex; align-items:center; justify-content:flex-end;
+    gap:10px;
+    padding: 18px 24px;
+    z-index:4;
+  }
+  .platformLink{
+    display:flex; align-items:center; gap:7px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(20,10,14,0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(244,230,200,0.18);
+    color: var(--cream);
+    text-decoration:none;
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size: 12.5px;
+    transition: transform .15s, background .15s;
+  }
+  .platformLink:hover{ transform: translateY(-1px); background: rgba(20,10,14,0.72); }
+  .platformLink svg{ width:16px; height:16px; flex:0 0 auto; }
 </style>
 </head>
 <body>
 
 <div class="stage">
+
+  <div class="navbar">
+    <a class="platformLink" href="https://open.spotify.com/playlist/6pta3N6Es4jv2TX7vayqAA?si=VSKiO_D4QBuK2Y2zg6jwLw&utm_source=copy-link&pi=yBcNVnD5Q-eD_&sci=spotify%3Acard-config%3A2mOSFyxc17gN0J22RhuM3P" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="#1ED760"><circle cx="12" cy="12" r="12"/><path d="M17.5 10.8c-3-1.8-8-2-10.9-1.1-.5.1-1-.1-1.1-.6-.1-.5.1-1 .6-1.1 3.3-1 8.8-.8 12.3 1.3.4.3.5.8.3 1.2-.3.4-.8.5-1.2.3zM16.4 13.7c-2.5-1.5-6.3-2-9.3-1.1-.4.1-.8-.1-.9-.5-.1-.4.1-.8.5-.9 3.4-1 7.6-.5 10.5 1.2.3.2.4.7.2 1s-.7.4-1 .3zM15.4 16.6c-2.1-1.3-4.8-1.6-7.9-.9-.3.1-.7-.1-.7-.4-.1-.3.1-.7.4-.7 3.4-.8 6.4-.4 8.8 1.1.3.2.4.5.2.8-.2.2-.5.3-.8.1z" fill="#0B1A10"/></svg>
+      Spotify
+    </a>
+    <a class="platformLink" href="https://music.youtube.com/playlist?list=PLBBAZGPNSYXVrxyJuoIYYcsEhxZwIV61y&si=zP18AvKKgoE0_5TM" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="#FF0000"><circle cx="12" cy="12" r="12"/><path d="M9.5 8v8l7-4-7-4z" fill="#fff"/></svg>
+      YT Music
+    </a>
+  </div>
 
   <div class="titleWrap">
     <div class="eyebrow"><span class="dot-online"></span>31 यार टपरी पे</div>
@@ -202,11 +243,11 @@
       <div class="disc" id="disc"><div class="hole"></div></div>
     </div>
     <div class="meta">
-      <div class="track" id="trackName">Yaariyan</div>
-      <div class="artist" id="trackArtist">Dosti Waale</div>
+      <div class="track" id="trackName">Loading playlist…</div>
+      <div class="artist" id="trackArtist">Dosti Banger Radio</div>
       <div class="progressRow">
         <div class="progressBar" id="progressBar"><div class="progressFill" id="progressFill"></div></div>
-        <div class="time" id="timeLabel">0:00 / 3:52</div>
+        <div class="time" id="timeLabel">0:00 / 0:00</div>
       </div>
     </div>
     <div class="controls">
@@ -227,22 +268,20 @@
   </div>
 </div>
 
+<!-- hidden YouTube player: powers real audio, no login needed for visitors -->
+<div id="ytHost" style="position:fixed; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;"></div>
+
 <script>
-  // playlist (fictional "dosti" tracks)
-  const playlist = [
-    {name:'Kadak Chai', artist:'Tapri Waale', duration:232},
-    {name:'Nukkad Adda', artist:'Gully Tribe', duration:250},
-    {name:'Cutting Chai Circle', artist:'Adda Boys', duration:208},
-    {name:'Bhai Log', artist:'Squad Goals', duration:275}
-  ];
-  let idx = 0;
+  // ---- Real playback via YouTube IFrame API, sourced from your YT Music playlist ----
+  const YT_PLAYLIST_ID = 'PLBBAZGPNSYXVrxyJuoIYYcsEhxZwIV61y';
+
+  let ytPlayer = null;
+  let ytReady = false;
   let playing = false;
-  let elapsed = 0;
-  let timer = null;
+  let progressTimer = null;
 
   const disc = document.getElementById('disc');
   const playBtn = document.getElementById('playBtn');
-  const playIcon = document.getElementById('playIcon');
   const trackName = document.getElementById('trackName');
   const trackArtist = document.getElementById('trackArtist');
   const progressFill = document.getElementById('progressFill');
@@ -250,60 +289,98 @@
   const timeLabel = document.getElementById('timeLabel');
 
   function fmt(s){
+    if(!isFinite(s) || s < 0) s = 0;
     const m = Math.floor(s/60), r = Math.floor(s%60);
     return m+':'+String(r).padStart(2,'0');
   }
 
-  function loadTrack(i, autoplay){
-    idx = (i+playlist.length)%playlist.length;
-    const t = playlist[idx];
-    trackName.textContent = t.name;
-    trackArtist.textContent = t.artist;
-    elapsed = 0;
-    updateUI();
-    if(autoplay) play(); else pause();
+  function setPlayIcon(isPlaying){
+    document.getElementById('playIcon').outerHTML = isPlaying
+      ? '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>'
+      : '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   }
 
-  function updateUI(){
-    const t = playlist[idx];
-    const pct = Math.min(100,(elapsed/t.duration)*100);
-    progressFill.style.width = pct+'%';
-    timeLabel.textContent = fmt(elapsed)+' / '+fmt(t.duration);
+  function updateNowPlayingInfo(){
+    if(!ytPlayer || !ytPlayer.getVideoData) return;
+    const data = ytPlayer.getVideoData();
+    if(data && data.title){
+      trackName.textContent = data.title;
+      trackArtist.textContent = data.author || 'YouTube Music';
+    }
   }
 
-  function play(){
-    playing = true;
-    disc.classList.add('spinning');
-    playIcon.outerHTML = '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
-    playBtn.title = 'Pause';
-    clearInterval(timer);
-    timer = setInterval(()=>{
-      elapsed += 1;
-      const t = playlist[idx];
-      if(elapsed >= t.duration){ loadTrack(idx+1, true); return; }
-      updateUI();
-    },1000);
+  function startProgressLoop(){
+    clearInterval(progressTimer);
+    progressTimer = setInterval(()=>{
+      if(!ytPlayer || !ytPlayer.getCurrentTime) return;
+      const cur = ytPlayer.getCurrentTime() || 0;
+      const dur = ytPlayer.getDuration() || 0;
+      const pct = dur ? Math.min(100,(cur/dur)*100) : 0;
+      progressFill.style.width = pct+'%';
+      timeLabel.textContent = fmt(cur)+' / '+fmt(dur);
+    }, 500);
   }
 
-  function pause(){
-    playing = false;
-    disc.classList.remove('spinning');
-    document.getElementById('playIcon').outerHTML = '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-    playBtn.title = 'Play';
-    clearInterval(timer);
-  }
+  // Loads the YouTube IFrame API script
+  const ytScript = document.createElement('script');
+  ytScript.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(ytScript);
 
-  playBtn.addEventListener('click', ()=> playing ? pause() : play());
-  document.getElementById('nextBtn').addEventListener('click', ()=> loadTrack(idx+1, playing));
-  document.getElementById('prevBtn').addEventListener('click', ()=> loadTrack(idx-1, playing));
-  progressBar.addEventListener('click', (e)=>{
-    const rect = progressBar.getBoundingClientRect();
-    const pct = (e.clientX-rect.left)/rect.width;
-    elapsed = Math.max(0, Math.min(playlist[idx].duration, pct*playlist[idx].duration));
-    updateUI();
+  window.onYouTubeIframeAPIReady = function(){
+    ytPlayer = new YT.Player('ytHost', {
+      height: '1', width: '1',
+      playerVars: { listType: 'playlist', list: YT_PLAYLIST_ID, autoplay: 0, playsinline: 1 },
+      events: {
+        onReady: function(){
+          ytReady = true;
+          trackName.textContent = 'Ready — press play';
+          trackArtist.textContent = 'Dosti Banger Radio';
+        },
+        onStateChange: function(e){
+          if(e.data === YT.PlayerState.PLAYING){
+            playing = true;
+            disc.classList.add('spinning');
+            setPlayIcon(true);
+            startProgressLoop();
+            setTimeout(updateNowPlayingInfo, 300);
+          } else if(e.data === YT.PlayerState.PAUSED){
+            playing = false;
+            disc.classList.remove('spinning');
+            setPlayIcon(false);
+            clearInterval(progressTimer);
+          } else if(e.data === YT.PlayerState.CUED){
+            setTimeout(updateNowPlayingInfo, 300);
+          }
+        }
+      }
+    });
+  };
+
+  playBtn.addEventListener('click', ()=>{
+    if(!ytReady) return;
+    if(playing){ ytPlayer.pauseVideo(); }
+    else { ytPlayer.playVideo(); }
   });
 
-  loadTrack(0,false);
+  document.getElementById('nextBtn').addEventListener('click', ()=>{
+    if(!ytReady) return;
+    ytPlayer.nextVideo();
+    if(!playing) ytPlayer.playVideo();
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', ()=>{
+    if(!ytReady) return;
+    ytPlayer.previousVideo();
+    if(!playing) ytPlayer.playVideo();
+  });
+
+  progressBar.addEventListener('click', (e)=>{
+    if(!ytReady || !ytPlayer.getDuration) return;
+    const rect = progressBar.getBoundingClientRect();
+    const pct = (e.clientX-rect.left)/rect.width;
+    const dur = ytPlayer.getDuration() || 0;
+    ytPlayer.seekTo(Math.max(0, Math.min(dur, pct*dur)), true);
+  });
 </script>
 
 </body>
