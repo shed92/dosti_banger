@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>दोस्ती बैंगर — Chai ki Tapri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Poppins:wght@400;500;600;700;800&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sindoor: #B8272C;
+    --sindoor-deep: #7A1B1F;
+    --indigo: #131B3A;
+    --turmeric: #F5A400;
+    --marigold: #E8641C;
+    --cream: #F4E6C8;
+    --charcoal: #201620;
+    --glass: rgba(20,10,14,0.45);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    background: var(--indigo);
+    font-family: 'Poppins', sans-serif;
+    color: var(--cream);
+    overflow-x:hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+
+  .stage{
+    position:relative;
+    min-height:100vh;
+    width:100%;
+    background-image:
+      linear-gradient(180deg, rgba(10,6,14,0.55) 0%, rgba(10,6,14,0.15) 30%, rgba(10,6,14,0.25) 60%, rgba(10,6,14,0.85) 100%),
+      url('chai-tapri-bg.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-bottom:170px;
+  }
+
+  /* ---------- Title block ---------- */
+  .titleWrap{
+    text-align:center;
+    margin-top:64px;
+    padding: 0 20px;
+    z-index:3;
+  }
+  .eyebrow{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    letter-spacing:.35em;
+    text-transform:uppercase;
+    font-size: 12px;
+    color: var(--turmeric);
+    margin-bottom: 10px;
+  }
+  h1.hindi{
+    font-family:'Yatra One', cursive;
+    font-size: clamp(52px, 13vw, 118px);
+    line-height: 1.02;
+    color: var(--cream);
+    text-shadow: 0 4px 0 rgba(0,0,0,0.35), 0 14px 34px rgba(0,0,0,0.45);
+    letter-spacing: 1px;
+  }
+  .tagline{
+    font-family:'Poppins', sans-serif;
+    font-weight:500;
+    font-size: clamp(14px, 2.4vw, 18px);
+    color: rgba(244,230,200,0.86);
+    max-width: 480px;
+    margin: 14px auto 0;
+    line-height:1.6;
+  }
+  .tagline b{ color: var(--turmeric); font-weight:700; }
+
+  /* ---------- Scene spacer: lets the photo show through below the title/stats ---------- */
+  .sceneSpacer{
+    width:100%;
+    flex: 1 1 auto;
+    min-height: 34vh;
+  }
+
+  /* ---------- badges ---------- */
+  .stats{
+    display:flex; gap:26px; margin-top:22px; z-index:3;
+    font-family:'Baloo 2', sans-serif;
+  }
+  .stat{ text-align:center; }
+  .stat .n{ font-size:22px; font-weight:700; color:var(--turmeric); }
+  .stat .l{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(244,230,200,0.7); }
+  .dot-online{ width:9px; height:9px; border-radius:50%; background:#38D66B; display:inline-block; box-shadow:0 0 8px #38D66B; margin-right:6px; }
+
+  /* ---------- Player ---------- */
+  .playerDock{
+    position:fixed; left:0; right:0; bottom:0;
+    display:flex; justify-content:center;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+    z-index: 20;
+    pointer-events:none;
+  }
+  .player{
+    pointer-events:auto;
+    width:100%; max-width: 560px;
+    background: linear-gradient(135deg, rgba(90,20,26,0.72), rgba(20,10,14,0.72));
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(244,230,200,0.16);
+    border-radius: 999px;
+    padding: 10px 18px 10px 10px;
+    display:flex; align-items:center; gap:14px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  }
+  .discWrap{
+    position:relative; width:52px; height:52px; flex:0 0 auto;
+  }
+  .disc{
+    width:52px; height:52px; border-radius:50%;
+    background: conic-gradient(from 0deg, #2B1418, #4A1E22, #2B1418, #4A1E22, #2B1418);
+    display:flex; align-items:center; justify-content:center;
+    animation: spin 6s linear infinite paused;
+    box-shadow: inset 0 0 0 2px rgba(244,230,200,0.15);
+  }
+  .disc.spinning{ animation-play-state: running; }
+  .disc .hole{ width:14px; height:14px; border-radius:50%; background: var(--turmeric); box-shadow: 0 0 0 3px rgba(20,10,14,0.6); }
+  @keyframes spin{ to{ transform: rotate(360deg);} }
+
+  .meta{ flex:1 1 auto; min-width:0; }
+  .track{ font-weight:700; font-size:14.5px; color:var(--cream); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .artist{ font-size:12px; color: rgba(244,230,200,0.68); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px;}
+  .progressRow{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+  .progressBar{ flex:1; height:4px; border-radius:2px; background: rgba(244,230,200,0.22); overflow:hidden; cursor:pointer; }
+  .progressFill{ height:100%; width:0%; background: linear-gradient(90deg, var(--turmeric), var(--marigold)); border-radius:2px; }
+  .time{ font-size:10px; color: rgba(244,230,200,0.6); min-width:64px; text-align:right; font-variant-numeric: tabular-nums; }
+
+  .controls{ display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+  .ctrlBtn{
+    background:none; border:none; cursor:pointer; color: var(--cream);
+    display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:50%;
+    opacity:.85; transition: opacity .15s, transform .15s;
+  }
+  .ctrlBtn:hover{ opacity:1; transform: scale(1.08); }
+  .playBtn{
+    width:42px; height:42px; background: var(--cream); color:var(--sindoor-deep);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  }
+  .playBtn:hover{ transform: scale(1.06); }
+  .spotifyMark{
+    width:20px;height:20px; flex:0 0 auto; opacity:.75;
+  }
+
+  footer{
+    margin-top: 30px; padding-bottom: 6px;
+    font-size:11px; color: rgba(244,230,200,0.45);
+    letter-spacing:.06em;
+    z-index:3;
+    text-align:center;
+  }
+
+  @media (max-width: 480px){
+    .stats{ gap:18px; }
+    .player{ padding:8px 14px 8px 8px; }
+    .track{ font-size:13.5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="titleWrap">
+    <div class="eyebrow"><span class="dot-online"></span>31 यार टपरी पे</div>
+    <h1 class="hindi">दोस्ती<br>बैंगर</h1>
+    <p class="tagline">गली के नुक्कड़ की <b>टपरी</b>, कटिंग चाय के कश और यारों की महफ़िल का साउंडट्रैक।</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">42</div><div class="l">Yaar</div></div>
+    <div class="stat"><div class="n">128</div><div class="l">Bangers</div></div>
+    <div class="stat"><div class="n">∞</div><div class="l">Cutting Chai</div></div>
+  </div>
+
+  <div class="sceneSpacer"></div>
+  <footer>दोस्ती बैंगर · मुंबई की हर टपरी का अपना रेडियो</footer>
+</div>
+
+<!-- Player dock -->
+<div class="playerDock">
+  <div class="player">
+    <div class="discWrap">
+      <div class="disc" id="disc"><div class="hole"></div></div>
+    </div>
+    <div class="meta">
+      <div class="track" id="trackName">Yaariyan</div>
+      <div class="artist" id="trackArtist">Dosti Waale</div>
+      <div class="progressRow">
+        <div class="progressBar" id="progressBar"><div class="progressFill" id="progressFill"></div></div>
+        <div class="time" id="timeLabel">0:00 / 3:52</div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrlBtn" id="prevBtn" aria-label="Previous track" title="Previous">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6L9 12l11 6z"/></svg>
+      </button>
+      <button class="ctrlBtn playBtn" id="playBtn" aria-label="Play" title="Play">
+        <svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="ctrlBtn" id="nextBtn" aria-label="Next track" title="Next">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM4 6l11 6-11 6z"/></svg>
+      </button>
+    </div>
+    <svg class="spotifyMark" viewBox="0 0 24 24" fill="#1ED760" title="Spotify-style player">
+      <circle cx="12" cy="12" r="12"/>
+      <path d="M17.5 10.8c-3-1.8-8-2-10.9-1.1-.5.1-1-.1-1.1-.6-.1-.5.1-1 .6-1.1 3.3-1 8.8-.8 12.3 1.3.4.3.5.8.3 1.2-.3.4-.8.5-1.2.3zM16.4 13.7c-2.5-1.5-6.3-2-9.3-1.1-.4.1-.8-.1-.9-.5-.1-.4.1-.8.5-.9 3.4-1 7.6-.5 10.5 1.2.3.2.4.7.2 1s-.7.4-1 .3zM15.4 16.6c-2.1-1.3-4.8-1.6-7.9-.9-.3.1-.7-.1-.7-.4-.1-.3.1-.7.4-.7 3.4-.8 6.4-.4 8.8 1.1.3.2.4.5.2.8-.2.2-.5.3-.8.1z" fill="#0B1A10"/>
+    </svg>
+  </div>
+</div>
+
+<script>
+  // playlist (fictional "dosti" tracks)
+  const playlist = [
+    {name:'Kadak Chai', artist:'Tapri Waale', duration:232},
+    {name:'Nukkad Adda', artist:'Gully Tribe', duration:250},
+    {name:'Cutting Chai Circle', artist:'Adda Boys', duration:208},
+    {name:'Bhai Log', artist:'Squad Goals', duration:275}
+  ];
+  let idx = 0;
+  let playing = false;
+  let elapsed = 0;
+  let timer = null;
+
+  const disc = document.getElementById('disc');
+  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
+  const trackName = document.getElementById('trackName');
+  const trackArtist = document.getElementById('trackArtist');
+  const progressFill = document.getElementById('progressFill');
+  const progressBar = document.getElementById('progressBar');
+  const timeLabel = document.getElementById('timeLabel');
+
+  function fmt(s){
+    const m = Math.floor(s/60), r = Math.floor(s%60);
+    return m+':'+String(r).padStart(2,'0');
+  }
+
+  function loadTrack(i, autoplay){
+    idx = (i+playlist.length)%playlist.length;
+    const t = playlist[idx];
+    trackName.textContent = t.name;
+    trackArtist.textContent = t.artist;
+    elapsed = 0;
+    updateUI();
+    if(autoplay) play(); else pause();
+  }
+
+  function updateUI(){
+    const t = playlist[idx];
+    const pct = Math.min(100,(elapsed/t.duration)*100);
+    progressFill.style.width = pct+'%';
+    timeLabel.textContent = fmt(elapsed)+' / '+fmt(t.duration);
+  }
+
+  function play(){
+    playing = true;
+    disc.classList.add('spinning');
+    playIcon.outerHTML = '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+    playBtn.title = 'Pause';
+    clearInterval(timer);
+    timer = setInterval(()=>{
+      elapsed += 1;
+      const t = playlist[idx];
+      if(elapsed >= t.duration){ loadTrack(idx+1, true); return; }
+      updateUI();
+    },1000);
+  }
+
+  function pause(){
+    playing = false;
+    disc.classList.remove('spinning');
+    document.getElementById('playIcon').outerHTML = '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    playBtn.title = 'Play';
+    clearInterval(timer);
+  }
+
+  playBtn.addEventListener('click', ()=> playing ? pause() : play());
+  document.getElementById('nextBtn').addEventListener('click', ()=> loadTrack(idx+1, playing));
+  document.getElementById('prevBtn').addEventListener('click', ()=> loadTrack(idx-1, playing));
+  progressBar.addEventListener('click', (e)=>{
+    const rect = progressBar.getBoundingClientRect();
+    const pct = (e.clientX-rect.left)/rect.width;
+    elapsed = Math.max(0, Math.min(playlist[idx].duration, pct*playlist[idx].duration));
+    updateUI();
+  });
+
+  loadTrack(0,false);
+</script>
+
+</body>
+</html>
