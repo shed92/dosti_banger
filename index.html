@@ -49,25 +49,14 @@
     padding-bottom:170px;
   }
 
-  /* ---------- Hero panel: dark glass card behind title so text stays legible on any photo ---------- */
-  .heroPanel{
-    align-self:flex-start;
-    margin: 26px 24px 0;
-    padding: 26px 28px 24px;
-    max-width: 640px;
-    background: rgba(10,6,10,0.55);
-    backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    border: 1px solid rgba(244,230,200,0.14);
-    border-radius: 22px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-    z-index:3;
-  }
-
   /* ---------- Title block ---------- */
   .titleWrap{
     text-align:left;
+    align-self:flex-start;
+    margin-top:26px;
+    padding: 0 24px;
     z-index:3;
+    max-width: 640px;
   }
   .eyebrow{
     font-family:'Baloo 2', sans-serif;
@@ -90,7 +79,7 @@
     font-family:'Poppins', sans-serif;
     font-weight:500;
     font-size: clamp(14px, 2.4vw, 18px);
-    color: rgba(244,230,200,0.9);
+    color: rgba(244,230,200,0.86);
     max-width: 480px;
     margin: 14px 0 0;
     line-height:1.6;
@@ -106,8 +95,10 @@
 
   /* ---------- badges ---------- */
   .stats{
-    display:flex; gap:26px; margin-top:20px; z-index:3;
+    display:flex; gap:26px; margin-top:22px; z-index:3;
     font-family:'Baloo 2', sans-serif;
+    align-self:flex-start;
+    padding: 0 24px;
   }
   .stat{ text-align:left; }
   .stat .n{ font-size:22px; font-weight:700; color:var(--turmeric); }
@@ -229,18 +220,15 @@
     </a>
   </div>
 
-  <div class="heroPanel">
-    <div class="titleWrap">
-      <div class="eyebrow"><span class="dot-online"></span>31 यार टपरी पे</div>
-      <h1 class="hindi">दोस्ती<br>बैंगर</h1>
-      <p class="tagline">गली के नुक्कड़ की <b>टपरी</b>, कटिंग चाय के कश और यारों की महफ़िल का साउंडट्रैक।</p>
-    </div>
+  <div class="titleWrap">
+    <div class="eyebrow"><span class="dot-online"></span><span id="visitCount">…</span> यार टपरी पे</div>
+    <h1 class="hindi">दोस्ती<br>बैंगर</h1>
+    <p class="tagline">गली के नुक्कड़ की <b>टपरी</b>, कटिंग चाय के कश और यारों की महफ़िल का साउंडट्रैक।</p>
+  </div>
 
-    <div class="stats">
-      <div class="stat"><div class="n">42</div><div class="l">Yaar</div></div>
-      <div class="stat"><div class="n">128</div><div class="l">Bangers</div></div>
-      <div class="stat"><div class="n">∞</div><div class="l">Cutting Chai</div></div>
-    </div>
+  <div class="stats">
+    <div class="stat"><div class="n">128</div><div class="l">Bangers</div></div>
+    <div class="stat"><div class="n">∞</div><div class="l">Cutting Chai</div></div>
   </div>
 
   <div class="sceneSpacer"></div>
@@ -283,6 +271,28 @@
 <div id="ytHost" style="position:fixed; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;"></div>
 
 <script>
+  // ---- Visitor counter: free, no-signup counting API (revival of the old countapi.xyz) ----
+  // Uses a unique key so it doesn't collide with anyone else's counter on the same service.
+  // NOTE: this is a running total ("Yaar Aaye" = total yaars who've dropped by), not concurrent
+  // live visitors — that would need a real backend (Firebase etc.), which we skipped for now.
+  (function(){
+    const COUNTER_KEY = 'dosti-banger-tapri-9x7q2';
+    const visitCountEl = document.getElementById('visitCount');
+    fetch('https://countapi.mileshilliard.com/api/v1/hit/' + COUNTER_KEY)
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        if(data && typeof data.value === 'number'){
+          visitCountEl.textContent = data.value;
+        } else {
+          visitCountEl.textContent = '—';
+        }
+      })
+      .catch(function(){
+        // Service hiccup or blocked — fail quietly, don't break the page
+        visitCountEl.textContent = '—';
+      });
+  })();
+
   // ---- Real playback via YouTube IFrame API, sourced from your YT Music playlist ----
   const YT_PLAYLIST_ID = 'PLBBAZGPNSYXVrxyJuoIYYcsEhxZwIV61y';
 
@@ -311,12 +321,18 @@
       : '<svg id="playIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   }
 
-  function updateNowPlayingInfo(){
+  let infoRetryTimer = null;
+  function updateNowPlayingInfo(retries){
+    if(retries === undefined) retries = 10;
+    clearTimeout(infoRetryTimer);
     if(!ytPlayer || !ytPlayer.getVideoData) return;
     const data = ytPlayer.getVideoData();
     if(data && data.title){
       trackName.textContent = data.title;
       trackArtist.textContent = data.author || 'YouTube Music';
+    } else if(retries > 0){
+      // YT often hasn't populated video data yet right after a track change; keep polling briefly
+      infoRetryTimer = setTimeout(function(){ updateNowPlayingInfo(retries - 1); }, 300);
     }
   }
 
@@ -337,24 +353,10 @@
   ytScript.src = 'https://www.youtube.com/iframe_api';
   document.head.appendChild(ytScript);
 
-  // Safety net: if the API/script gets blocked (ad-blockers, network issues), don't leave the UI stuck silently
-  setTimeout(()=>{
-    if(!ytReady){
-      trackName.textContent = 'Player failed to load';
-      trackArtist.textContent = 'Check your connection / ad-blocker';
-    }
-  }, 8000);
-
   window.onYouTubeIframeAPIReady = function(){
     ytPlayer = new YT.Player('ytHost', {
       height: '1', width: '1',
-      playerVars: {
-        listType: 'playlist',
-        list: YT_PLAYLIST_ID,
-        autoplay: 0,
-        playsinline: 1,
-        origin: window.location.origin
-      },
+      playerVars: { listType: 'playlist', list: YT_PLAYLIST_ID, autoplay: 0, playsinline: 1 },
       events: {
         onReady: function(){
           ytReady = true;
@@ -374,20 +376,21 @@
             setPlayIcon(false);
             clearInterval(progressTimer);
           } else if(e.data === YT.PlayerState.CUED){
-            setTimeout(updateNowPlayingInfo, 300);
-          } else if(e.data === YT.PlayerState.ENDED){
-            // playlist wraps automatically, but keep UI in sync
-            setTimeout(updateNowPlayingInfo, 300);
+            setTimeout(function(){ updateNowPlayingInfo(); }, 300);
           }
         },
         onError: function(e){
-          // 2=bad param, 5=html5 error, 100=not found, 101/150=embedding disabled
-          // Skip the broken track instead of getting stuck
+          // Common causes: video is private/removed (100), or embedding disabled by owner (101/150).
+          // Without this, the player just stalls silently on that track — skip forward instead.
+          console.warn('YT player error', e.data, '- skipping unplayable track');
           trackName.textContent = 'Skipping unavailable track…';
-          if(ytPlayer && ytPlayer.nextVideo){
-            ytPlayer.nextVideo();
-            if(playing) setTimeout(()=>{ ytPlayer.playVideo(); }, 400);
-          }
+          trackArtist.textContent = 'Dosti Banger Radio';
+          setTimeout(function(){
+            if(ytPlayer && ytPlayer.nextVideo){
+              ytPlayer.nextVideo();
+              ytPlayer.playVideo();
+            }
+          }, 700);
         }
       }
     });
